@@ -1,0 +1,77 @@
+plugin.tx_vierwdgooglesitemap {
+	sitemap = USER
+	sitemap {
+		userFunc = Vierwd\VierwdGooglesitemap\Controller\SitemapController->generateAction
+
+		# DOKTYPE_DEFAULT = 1;
+		# DOKTYPE_LINK = 3;
+		# DOKTYPE_SHORTCUT = 4;
+		# DOKTYPE_BE_USER_SECTION = 6;
+		# DOKTYPE_MOUNTPOINT = 7;
+		# DOKTYPE_SPACER = 199;
+		# DOKTYPE_SYSFOLDER = 254;
+		# DOKTYPE_RECYCLER = 255;
+		settings.includeDoktypes = 1
+
+		settings.additionalLinks {
+			# products {
+			# 	records {
+			# 		table = tx_vierwddlw_domain_model_productcategory
+			# 		select {
+			# 			pidInList = 17
+			# 			andWhere = sys_language_uid=0
+			# 			languageField = 0
+			# 		}
+			# 	}
+
+			# 	typolink {
+			# 		parameter = record:products:tx_vierwddlw_domain_model_productcategory:{field:uid}
+			# 		parameter.insertData = 1
+			# 		useCacheHash = 1
+			# 		mergeWithLinkhandlerConfiguration = 1
+			# 	}
+			# }
+		}
+	}
+
+	robots = USER
+	robots {
+		userFunc = Vierwd\VierwdGooglesitemap\Controller\SitemapController->robotsAction
+	}
+}
+
+sitemap = PAGE
+sitemap {
+	typeNum = 150
+
+	config {
+		spamProtectEmailAddresses = 0
+		disableAllHeaderCode = 1
+		disableCharsetHeader = 1
+		xhtml_cleaning = 0
+		admPanel = 0
+		debug = 0
+		additionalHeaders.150.header = Content-Type: application/xml;charset=utf-8
+		additionalHeaders.150.replace = 1
+	}
+
+	10 =< plugin.tx_vierwdgooglesitemap.sitemap
+}
+
+robots = PAGE
+robots {
+	typeNum = 151
+
+	config {
+		spamProtectEmailAddresses = 0
+		disableAllHeaderCode = 1
+		disableCharsetHeader = 1
+		xhtml_cleaning = 0
+		admPanel = 0
+		debug = 0
+		additionalHeaders.151.header = Content-Type: text/plain;charset=utf-8
+		additionalHeaders.151.replace = 1
+	}
+
+	10 =< plugin.tx_vierwdgooglesitemap.robots
+}
