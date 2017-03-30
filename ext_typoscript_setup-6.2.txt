@@ -1,0 +1,2 @@
+sitemap.config.additionalHeaders = Content-Type: application/xml;charset=utf-8
+robots.config.additionalHeaders = Content-Type: text/plain;charset=utf-8
