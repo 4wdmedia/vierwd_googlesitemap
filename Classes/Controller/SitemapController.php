@@ -133,7 +133,10 @@ class SitemapController {
 	}
 
 	public function robotsAction($content, array $params) {
-		$sitemapLink = $this->cObj->getTypoLink_URL($GLOBALS['TSFE']->rootLine[0]['uid'] . ',150');
+		$sitemapLink = $this->cObj->typoLink_URL([
+			'parameter' => $GLOBALS['TSFE']->rootLine[0]['uid'] . ',150',
+			'forceAbsoluteUrl' => true,
+		]);
 		return implode("\n", [
 			'User-agent: *',
 			'Disallow:',
