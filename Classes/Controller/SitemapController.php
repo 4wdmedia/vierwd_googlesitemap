@@ -61,7 +61,7 @@ class SitemapController {
 
 		$res = $this->cObj->exec_getQuery($tableName, $queryConfiguration);
 
-		while (($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) !== false) {
+		while (($row = $this->fetchRow($res)) !== false) {
 
 			// Versioning preview:
 			$GLOBALS['TSFE']->sys_page->versionOL($tableName, $row, true);
@@ -81,9 +81,24 @@ class SitemapController {
 				$records[] = $row;
 			}
 		}
-		$GLOBALS['TYPO3_DB']->sql_free_result($res);
+		if (TYPO3_version <= '8.5.0') {
+			$GLOBALS['TYPO3_DB']->sql_free_result($res);
+		} else {
+			$res->closeCursor();
+		}
 
 		return $records;
+	}
+
+	/**
+	 * @param \mysqli_result|\Doctrine\DBAL\Driver\ResultStatement
+	 */
+	private function fetchRow($res) {
+		if (TYPO3_version <= '8.5.0') {
+			return $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		} else {
+			return $res->fetch(\PDO::FETCH_ASSOC);
+		}
 	}
 
 	protected function renderPages(array $pages = []) {
