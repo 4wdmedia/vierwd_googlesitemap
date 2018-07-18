@@ -42,7 +42,7 @@ class SitemapController {
 				$url = $typolinkRenderer->cObjGetSingle('TEXT', $typolinkConfiguration);
 				if ($url && !in_array($url, $this->urls)) {
 					$this->urls[] = $urls;
-					$result .= '<url><loc>' . $url . '</loc>';
+					$result .= '<url><loc>' . htmlspecialchars($url) . '</loc>';
 					if ($record['tstamp']) {
 						$result .= '<lastmod>' . date('c', $record['tstamp']) . '</lastmod>';
 					}
@@ -113,7 +113,7 @@ class SitemapController {
 					if ($url && !in_array($url, $this->urls)) {
 						$this->urls[] = $url;
 
-						$result .= '<url><loc>' . $url . '</loc>';
+						$result .= '<url><loc>' . htmlspecialchars($url) . '</loc>';
 						if ($page['SYS_LASTCHANGED']) {
 							$result .= '<lastmod>' . date('c', $page['SYS_LASTCHANGED']) . '</lastmod>';
 						}
