@@ -104,7 +104,7 @@ class SitemapController {
 	protected function renderPages(array $pages = []) {
 		$result = '';
 		foreach ($pages as $page) {
-			if (in_array($page['doktype'], $this->settings['includeDoktypes'])) {
+			if (in_array($page['doktype'], $this->settings['includeDoktypes']) && !$page['no_search']) {
 				if (!$GLOBALS['TSFE']->sys_language_uid || $page['_PAGES_OVERLAY']) {
 					$url = $this->cObj->typoLink_URL([
 						'parameter' => $page['uid'],
@@ -133,7 +133,7 @@ class SitemapController {
 		$pages = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'*',
 			'pages',
-			'pid=' . (int)$pageUid . ' AND no_search=0' . $GLOBALS['TSFE']->sys_page->enableFields('pages'),
+			'pid=' . (int)$pageUid . $GLOBALS['TSFE']->sys_page->enableFields('pages'),
 			'',
 			'sorting'
 		);
