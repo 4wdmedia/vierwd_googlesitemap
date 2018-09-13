@@ -122,8 +122,11 @@ class SitemapController {
 				}
 			}
 
-			$subpages = $this->getSubpages($page['uid']);
-			$result .= $this->renderPages($subpages);
+			if (!$page['no_search'] || !$page['extendToSubpages']) {
+				// add subpages
+				$subpages = $this->getSubpages($page['uid']);
+				$result .= $this->renderPages($subpages);
+			}
 		}
 
 		return $result;
