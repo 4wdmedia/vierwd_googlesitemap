@@ -41,7 +41,7 @@ class SitemapController {
 				$typolinkRenderer->start($record, $configuration['records.']['table']);
 				$url = $typolinkRenderer->cObjGetSingle('TEXT', $typolinkConfiguration);
 				if ($url && !in_array($url, $this->urls)) {
-					$this->urls[] = $urls;
+					$this->urls[] = $url;
 					$result .= '<url><loc>' . htmlspecialchars($url) . '</loc>';
 					if ($record['tstamp']) {
 						$result .= '<lastmod>' . date('c', $record['tstamp']) . '</lastmod>';
