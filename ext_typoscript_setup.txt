@@ -13,13 +13,15 @@ plugin.tx_vierwdgooglesitemap {
 		# DOKTYPE_RECYCLER = 255;
 		settings.includeDoktypes = 1
 
+		settings.showAlternateLanguages = 0
+
 		settings.additionalLinks {
 			# products {
 			# 	records {
 			# 		table = tx_vierwddlw_domain_model_productcategory
 			# 		select {
 			# 			pidInList = 17
-			# 			andWhere = sys_language_uid=0
+			# 			where = sys_language_uid=0
 			# 			languageField = 0
 			# 		}
 			# 	}

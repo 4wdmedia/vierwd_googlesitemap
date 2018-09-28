@@ -17,9 +17,18 @@ class SitemapController {
 	 */
 	public $settings = [];
 
+	/**
+	 * @var array
+	 */
+	public $languages = [];
+
 	public function generateAction($content, array $params) {
 		$this->settings = $params['settings.'];
 		$this->settings['includeDoktypes'] = GeneralUtility::intExplode(',', $this->settings['includeDoktypes']);
+
+		if ($this->settings['showAlternateLanguages']) {
+			$this->languages = $this->loadLanguages();
+		}
 
 		$typolinkRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class);
 
@@ -28,7 +37,8 @@ class SitemapController {
 		$GLOBALS['TSFE']->gr_list = '0,-1';
 
 		$page = $GLOBALS['TSFE']->sys_page->getPage($GLOBALS['TSFE']->rootLine[0]['uid']);
-		$result = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+		$result = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+		$result .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">';
 		$result .= $this->renderPages([$page]);
 
 		foreach ($this->settings['additionalLinks.'] as $configuration) {
@@ -54,6 +64,16 @@ class SitemapController {
 		$result .= '</urlset>';
 
 		return $result;
+	}
+
+	protected function loadLanguages() {
+		$languages = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+			'*',
+			'sys_language',
+			'1' . $GLOBALS['TSFE']->sys_page->enableFields('sys_language')
+		);
+		$languages = array_column($languages, null, 'uid');
+		return $languages;
 	}
 
 	protected function getRecords($tableName, array $queryConfiguration) {
@@ -103,6 +123,12 @@ class SitemapController {
 
 	protected function renderPages(array $pages = []) {
 		$result = '';
+
+		if ($this->settings['showAlternateLanguages']) {
+			$pageUids = array_column($pages, 'uid');
+			$pageTranslations = $this->getPageTranslations($pageUids);
+		}
+
 		foreach ($pages as $page) {
 			if (in_array($page['doktype'], $this->settings['includeDoktypes']) && !$page['no_search']) {
 				if (!$GLOBALS['TSFE']->sys_language_uid || $page['_PAGES_OVERLAY']) {
@@ -114,6 +140,22 @@ class SitemapController {
 						$this->urls[] = $url;
 
 						$result .= '<url><loc>' . htmlspecialchars($url) . '</loc>';
+
+						if ($this->settings['showAlternateLanguages'] && $pageTranslations && $pageTranslations[$page['uid']]) {
+							foreach ($pageTranslations[$page['uid']] as $translation) {
+								$language = $this->languages[$translation];
+								$hreflang = $language['language_isocode'];
+								if ($hreflang !== $language['flag']) {
+									$hreflang .= '-' . $language['flag'];
+								}
+								$alternateUrl = $this->cObj->typoLink_URL([
+									'parameter' => $page['uid'],
+									'additionalParams' => '&L=' . $translation,
+									'forceAbsoluteUrl' => true,
+								]);
+								$result .= '<xhtml:link rel="alternate" hreflang="' . $hreflang . '" href="' . htmlspecialchars($alternateUrl) . '"/>';
+							}
+						}
 						if ($page['SYS_LASTCHANGED']) {
 							$result .= '<lastmod>' . date('c', $page['SYS_LASTCHANGED']) . '</lastmod>';
 						}
@@ -129,6 +171,23 @@ class SitemapController {
 			}
 		}
 
+		return $result;
+	}
+
+	protected function getPageTranslations(array $pageUids) {
+		if (!$pageUids) {
+			return [];
+		}
+
+		$pageTranslations = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+			'*',
+			'pages_language_overlay',
+			'pid IN (' . implode(',', $pageUids) . ')' . $GLOBALS['TSFE']->sys_page->enableFields('pages_language_overlay')
+		);
+		$result = [];
+		foreach ($pageTranslations as $translation) {
+			$result[$translation['pid']][] = $translation['sys_language_uid'];
+		}
 		return $result;
 	}
 
